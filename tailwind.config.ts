@@ -1,4 +1,6 @@
 import type { Config } from "tailwindcss";
+const { fontFamily } = require("tailwindcss/defaultTheme");
+
 
 export default {
   content: [
@@ -12,6 +14,10 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+    },
+    fontFamily: {
+      fredoka: ["Fredoka", ...fontFamily.sans],
+      Bari: ["Barriecito", ...fontFamily.sans],
     },
   },
   plugins: [],
