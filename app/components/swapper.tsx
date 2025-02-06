@@ -1,35 +1,118 @@
-'use client'
+// components/Swapper.tsx
+'use client';
+import { useState } from 'react';
+import { motion, LayoutGroup } from 'framer-motion';
+import { ArrowsUpDownIcon } from '@heroicons/react/24/outline';
+import { SwapInput } from './swapInput';
+import { ALGO_ASSET_ID, ORA_ASSET_ID } from '../constants';
+import { SwapButton } from './swapButton';
 
-import { ArrowsUpDownIcon } from "@heroicons/react/16/solid"
-import { SwapInput } from "./swapInput"
-import { useEffect, useState } from "react"
-import { ALGO_ASSET_ID, COMPX_API_URL, ORA_ASSET_ID } from "../constants"
-import axios from "axios"
-
+// Replace these with your actual asset IDs
 
 export const Swapper: React.FC = () => {
+    // When isSwapped is false:
+    //   Top = ORA_ASSET_ID, Bottom = ALGO_ASSET_ID.
+    // When true, we swap the order.
+    const [isSwapped, setIsSwapped] = useState(false);
 
-    const [swapFromAssetId, setSwapFromAssetId] = useState<number>(ORA_ASSET_ID)
-    const [swapToAssetId, setSwapToAssetId] = useState<number>(ALGO_ASSET_ID)
-
-    function onClickSwitchAssets() {
-        const temp = swapFromAssetId
-        setSwapFromAssetId(swapToAssetId)
-        setSwapToAssetId(temp)
+    const onClickSwitchAssets = () => {
+        setIsSwapped((prev) => !prev);
     };
 
     return (
-        <div className="mx-3 flex flex-col gap-3">
-            <SwapInput assetId={swapFromAssetId} />
-            <button
-                onClick={onClickSwitchAssets}
-                className="w-full flex mx-auto justify-center">
-                <ArrowsUpDownIcon className="w-12 h-12 text-lime-300 bg-orange-400 rounded-full border-4 border-lime-300 hover:border-orange-400 hover:text-orange-400 hover:bg-lime-300 hover:scale-150 ease-in-out transition-all" />
-            </button>
-            <SwapInput assetId={swapToAssetId} />
-            <div className="flex w-full mx-auto justify-center">
-                <button className="bg-lime-300 text-orange-400 text-3xl font-fredoka rounded-full px-6 py-2 w-1/2 hover:bg-orange-400 hover:text-lime-300 border-4 border-orange-400 hover:border-lime-300 shadow-xl">Swap</button>
+        <LayoutGroup>
+            <div className="mx-3 flex flex-col gap-3">
+                {isSwapped ? (
+                    // When swapped, render the ALGO token on top and the ORA token on bottom.
+                    <>
+                        {/* Use a key that reflects its new position */}
+                        <motion.div
+                            layout
+                            key="asset-2"
+                            animate={{ scale: [0.9, 1.05, 1] }}
+                            transition={{
+                                layout: { type: 'spring', stiffness: 700, damping: 30 },
+                                duration: 0.3,
+                            }}
+                        >
+                            <SwapInput assetId={ALGO_ASSET_ID} />
+                        </motion.div>
+
+
+
+                        <motion.button
+                            layout
+                            key="arrow"
+                            onClick={onClickSwitchAssets}
+                            className="w-full flex mx-auto justify-center"
+                            transition={{ layout: { type: 'spring', stiffness: 300, damping: 20  }, ease: "easeInOut" }}
+                        >
+                            <ArrowsUpDownIcon className="w-12 h-12 text-lime-300 bg-orange-400 rounded-full border-4 border-lime-300 hover:border-orange-400 hover:text-orange-400 hover:bg-lime-300 hover:scale-150 ease-in-out transition-all" />
+                        </motion.button>
+
+                        <motion.div
+                            layout
+                            key="asset-1"
+                            // Animate scale through keyframes
+                            animate={{ scale: [0.9, 1.03, 1] }}
+                            transition={{
+                                layout: { type: 'spring', stiffness: 700, damping: 30 },
+                                duration: 0.3,
+                            }}
+                        >
+                            <SwapInput assetId={ORA_ASSET_ID} />
+                        </motion.div>
+
+
+                    </>
+                ) : (
+                    // When not swapped, render the ORA token on top and the ALGO token on bottom.
+                    <>
+                        <motion.div
+                            layout
+                            key="asset-1"
+                            // Animate scale through keyframes
+                            animate={{ scale: [0.9, 1.05, 1] }}
+                            transition={{
+                                layout: { type: 'spring', stiffness: 700, damping: 30 },
+                                duration: 0.3,
+                            }}
+                        >
+                            <SwapInput assetId={ORA_ASSET_ID} />
+                        </motion.div>
+
+
+
+                        <motion.button
+                            layout
+                            key="arrow"
+                            onClick={onClickSwitchAssets}
+                            className="w-full flex mx-auto justify-center"
+                            transition={{ layout: { type: 'spring', stiffness: 300, damping: 20  }, ease: "easeInOut" }}
+                        >
+                            <ArrowsUpDownIcon className="w-12 h-12 text-lime-300 bg-orange-400 rounded-full border-4 border-lime-300 hover:border-orange-400 hover:text-orange-400 hover:bg-lime-300 hover:scale-150 ease-in-out transition-all" />
+                        </motion.button>
+
+                        <motion.div
+                            layout
+                            key="asset-2"
+                            animate={{ scale: [0.9, 1.05, 1] }}
+                            transition={{
+                                layout: { type: 'spring', stiffness: 700, damping: 30 },
+                                duration: 0.3,
+                            }}
+                        >
+                            <SwapInput assetId={ALGO_ASSET_ID} />
+                        </motion.div>
+
+
+                    </>
+                )}
+
+                <div className="flex w-full mx-auto justify-center">
+                    <SwapButton />
+                </div>
             </div>
-        </div>
-    )
-}
+        </LayoutGroup>
+    );
+};

@@ -20,7 +20,7 @@ export const SwapInput: React.FC<SwapInputProps> = ({
                     height={100}
                     priority
                 />
-                <Input className="w-full font-fredoka rounded-full border-4 border-lime-300 text-4xl text-orange-400 text-right px-4" placeholder="0.00" />
+                <Input className="w-full font-Bari rounded-full border-4 border-lime-300 text-4xl text-orange-400 text-right px-4" placeholder="0.00" />
             </div>
         </div>
     );
