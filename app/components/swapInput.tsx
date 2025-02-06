@@ -1,20 +1,21 @@
 import { Input } from "@headlessui/react";
 import Image from "next/image";
+import { ASSET_INFO } from "../constants";
 
 export interface SwapInputProps {
-    tokenName: string;
+    assetId: number;
 }
 
 export const SwapInput: React.FC<SwapInputProps> = ({
-    tokenName
+    assetId
 }) => {
     return (
         <div className="w-full  rounded-full shadow-xl bg-orange-400 flex flex-col gap-4 p-4 border-4 border-lime-300">
             <div className="flex justify-between space-x-2">
                 <Image
-                    src={`/${tokenName}-logo.png`}
+                    src={`/${ASSET_INFO[assetId].params["unit-name"]}-logo.png`}
                     className=""
-                    alt={tokenName}
+                    alt={ASSET_INFO[assetId].params["unit-name"]}
                     width={100}
                     height={100}
                     priority
