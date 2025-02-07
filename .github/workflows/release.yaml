@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - '.vscode/**'
+      - '.idea/**'
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  citrus_swap-contracts-validate:
+    name: Run citrus_swap-contracts release
+    secrets: inherit
+    uses: ./.github/workflows/citrus_swap-contracts-ci.yaml
+
+  citrus_swap-contracts-release:
+    name: Run citrus_swap-contracts release
+    secrets: inherit
+    uses: ./.github/workflows/citrus_swap-contracts-cd.yaml
+    needs: citrus_swap-contracts-validate
+
+  citrus_swap-frontend-validate:
+    name: Run citrus_swap-frontend release
+    secrets: inherit
+    uses: ./.github/workflows/citrus_swap-frontend-ci.yaml
+
+  citrus_swap-frontend-release:
+    name: Run citrus_swap-frontend release
+    secrets: inherit
+    uses: ./.github/workflows/citrus_swap-frontend-cd.yaml
+    needs: citrus_swap-frontend-validate

@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# citrus_swap
 
-## Getting Started
+Lastest: This starter full stack project has been generated using AlgoKit. See below for default getting started instructions.
 
-First, run the development server:
+## Setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Initial setup
+1. Clone this repository to your local machine.
+2. Ensure [Docker](https://www.docker.com/) is installed and operational. Then, install `AlgoKit` following this [guide](https://github.com/algorandfoundation/algokit-cli#install).
+3. Run `algokit project bootstrap all` in the project directory. This command sets up your environment by installing necessary dependencies, setting up a Python virtual environment, and preparing your `.env` file.
+4. In the case of a smart contract project, execute `algokit generate env-file -a target_network localnet` from the `citrus_swap-contracts` directory to create a `.env.localnet` file with default configuration for `localnet`.
+5. To build your project, execute `algokit project run build`. This compiles your project and prepares it for running.
+6. For project-specific instructions, refer to the READMEs of the child projects:
+   - Smart Contracts: [citrus_swap-contracts](projects/citrus_swap-contracts/README.md)
+   - Frontend Application: [citrus_swap-frontend](projects/citrus_swap-frontend/README.md)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> This project is structured as a monorepo, refer to the [documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/project/run.md) to learn more about custom command orchestration via `algokit project run`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Subsequently
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. If you update to the latest source code and there are new dependencies, you will need to run `algokit project bootstrap all` again.
+2. Follow step 3 above.
 
-## Learn More
+### Continuous Integration / Continuous Deployment (CI/CD)
 
-To learn more about Next.js, take a look at the following resources:
+This project uses [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions) to define CI/CD workflows, which are located in the [`.github/workflows`](./.github/workflows) folder. You can configure these actions to suit your project's needs, including CI checks, audits, linting, type checking, testing, and deployments to TestNet.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+For pushes to `main` branch, after the above checks pass, the following deployment actions are performed:
+  - The smart contract(s) are deployed to TestNet using [AlgoNode](https://algonode.io).
+  - The frontend application is deployed to a provider of your choice (Netlify, Vercel, etc.). See [frontend README](frontend/README.md) for more information.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+> Please note deployment of smart contracts is done via `algokit deploy` command which can be invoked both via CI as seen on this project, or locally. For more information on how to use `algokit deploy` please see [AlgoKit documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/deploy.md).
 
-## Deploy on Vercel
+## Tools
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This project makes use of Python and React to build Algorand smart contracts and to provide a base project configuration to develop frontends for your Algorand dApps and interactions with smart contracts. The following tools are in use:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Algorand, AlgoKit, and AlgoKit Utils
+- Python dependencies including Poetry, Black, Ruff or Flake8, mypy, pytest, and pip-audit
+- React and related dependencies including AlgoKit Utils, Tailwind CSS, daisyUI, use-wallet, npm, jest, playwright, Prettier, ESLint, and Github Actions workflows for build validation
+
+### VS Code
+
+It has also been configured to have a productive dev experience out of the box in [VS Code](https://code.visualstudio.com/), see the [backend .vscode](./backend/.vscode) and [frontend .vscode](./frontend/.vscode) folders for more details.
+
+## Integrating with smart contracts and application clients
+
+Refer to the [citrus_swap-contracts](projects/citrus_swap-contracts/README.md) folder for overview of working with smart contracts, [projects/citrus_swap-frontend](projects/citrus_swap-frontend/README.md) for overview of the React project and the [projects/citrus_swap-frontend/contracts](projects/citrus_swap-frontend/src/contracts/README.md) folder for README on adding new smart contracts from backend as application clients on your frontend. The templates provided in these folders will help you get started.
+When you compile and generate smart contract artifacts, your frontend component will automatically generate typescript application clients from smart contract artifacts and move them to `frontend/src/contracts` folder, see [`generate:app-clients` in package.json](projects/citrus_swap-frontend/package.json). Afterwards, you are free to import and use them in your frontend application.
+
+The frontend starter also provides an example of interactions with your CitrusSwapClient in [`AppCalls.tsx`](projects/citrus_swap-frontend/src/components/AppCalls.tsx) component by default.
+
+## Next Steps
+
+You can take this project and customize it to build your own decentralized applications on Algorand. Make sure to understand how to use AlgoKit and how to write smart contracts for Algorand before you start.
