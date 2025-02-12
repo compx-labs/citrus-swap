@@ -1,0 +1,14 @@
+name: Pull Request validation
+
+on: [pull_request]
+
+
+jobs:
+  citrus_swap-contracts-ci:
+    name: Run citrus_swap-contracts validation
+    uses: ./.github/workflows/citrus_swap-contracts-ci.yaml
+
+  citrus_swap-frontend-ci:
+    name: Run citrus_swap-frontend validation
+    uses: ./.github/workflows/citrus_swap-frontend-ci.yaml
+

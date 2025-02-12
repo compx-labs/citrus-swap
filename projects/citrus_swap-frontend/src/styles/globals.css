@@ -1,0 +1,66 @@
+/* globals.css */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barriecito&family=Fredoka:wght@300..700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Define root colours */
+:root {
+  --background: #ce8936;
+  --foreground: #d13939;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+/* General body styling */
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Fredoka', Arial, Helvetica, sans-serif; /* Use Fredoka font */
+}
+
+/* Styling for all headings and code/pre elements */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+code,
+pre {
+  font-family: 'Barriecito', sans-serif; /* Use Barriecito font for headers */
+}
+
+/* Additional styling for code and pre elements */
+code,
+pre {
+  font-family: 'Barriecito', monospace;
+}
+
+/* Add specific styles for the Header */
+header {
+  font-family: 'Fredoka', Arial, Helvetica, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Ensure links inherit font and colour */
+header a {
+  font-family: 'Fredoka', Arial, Helvetica, sans-serif;
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+header button {
+  font-family: 'Fredoka', Arial, Helvetica, sans-serif;
+  background-color: var(--foreground);
+  color: var(--background);
+  border: none;
+}
