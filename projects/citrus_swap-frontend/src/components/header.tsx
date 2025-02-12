@@ -21,11 +21,22 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // Wallet information
-  const { activeAddress } = useWallet()
+  const { activeAddress, providers } = useWallet()
+  console.log('activeAddress', activeAddress)
 
   // Toggle functions
   const toggleWalletModal = () => setOpenWalletModal(!openWalletModal)
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
+
+  const disconnectWallet = () => {
+    if (providers) {
+      for (const provider of providers) {
+        if (provider.isActive) {
+          provider.disconnect()
+        }
+      }
+    }
+  }
 
   return (
     <header className="bg-white">
@@ -53,13 +64,23 @@ export function Header() {
             </a>
           ))}
           {/* Connect Wallet Button */}
-          <button
-            data-test-id="connect-wallet"
-            className="bg-orange-400 rounded-full text-lime-300 px-6 py-2 text-2xl font-semibold shadow-lg hover:bg-orange-500"
-            onClick={toggleWalletModal}
-          >
-            {activeAddress ? 'Connected' : 'Connect Wallet'}
-          </button>
+          {activeAddress ? (
+            <button
+              data-test-id="connect-wallet"
+              className="bg-orange-400 rounded-full text-lime-300 px-6 py-2 text-2xl font-semibold shadow-lg hover:bg-orange-500"
+              onClick={disconnectWallet}
+            >
+              Disconnect
+            </button>
+          ) : (
+            <button
+              data-test-id="connect-wallet"
+              className="bg-orange-400 rounded-full text-lime-300 px-6 py-2 text-2xl font-semibold shadow-lg hover:bg-orange-500"
+              onClick={toggleWalletModal}
+            >
+              Connect
+            </button>
+          )}
           {/* Wallet Modal */}
           <ConnectWallet openModal={openWalletModal} closeModal={toggleWalletModal} />
         </div>
@@ -98,12 +119,21 @@ export function Header() {
               </div>
               {/* Wallet Button */}
               <div className="py-6">
-                <button
-                  onClick={toggleWalletModal}
-                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-gray-900 hover:bg-gray-50"
-                >
-                  {activeAddress ? 'Connected' : 'Connect Wallet'}
-                </button>
+                {!activeAddress ? (
+                  <button
+                    onClick={toggleWalletModal}
+                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-gray-900 hover:bg-gray-50"
+                  >
+                    Connect
+                  </button>
+                ) : (
+                  <button
+                    onClick={disconnectWallet}
+                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-gray-900 hover:bg-gray-50"
+                  >
+                    Disconnect
+                  </button>
+                )}
               </div>
             </div>
           </div>

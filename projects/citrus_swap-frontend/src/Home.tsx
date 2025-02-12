@@ -24,7 +24,7 @@ const Home: React.FC<HomeProps> = () => {
           <h1 className="font-Bari text-4xl sm:text-6xl text-lime-400">Welcome to Citrus Swap</h1>
           <h2 className="font-Bari text-2xl sm:text-4xl text-lime-300">The ORA micro-DEX</h2>
         </div>
-        <main className="flex flex-col gap-10 row-start-2 items-center sm:items-start mt-10 ">
+        <main className="flex flex-col gap-10 row-start-2 items-center mt-10 ">
           <Swapper />
         </main>
 
