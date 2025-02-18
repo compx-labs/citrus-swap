@@ -2,9 +2,9 @@
 
 import { Dialog } from '@headlessui/react'
 import { useWallet } from '@txnlab/use-wallet'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { FaBars, FaTimes } from 'react-icons/fa'
-import ConnectWallet from './ConnectWallet'
+import { WalletContext } from '../context/wallet'
 
 // Navigation links
 const navigation = [
@@ -14,18 +14,14 @@ const navigation = [
 ]
 
 export function Header() {
-  // State for managing wallet modal visibility
-  const [openWalletModal, setOpenWalletModal] = useState(false)
-
   // State for managing mobile menu visibility
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // Wallet information
   const { activeAddress, providers } = useWallet()
-  console.log('activeAddress', activeAddress)
 
+  const { setDisplayWalletConnectModal, displayWalletConnectModal } = useContext(WalletContext)
   // Toggle functions
-  const toggleWalletModal = () => setOpenWalletModal(!openWalletModal)
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
 
   const disconnectWallet = () => {
@@ -76,13 +72,11 @@ export function Header() {
             <button
               data-test-id="connect-wallet"
               className="bg-orange-400 rounded-full text-lime-300 px-6 py-2 text-2xl font-semibold shadow-lg hover:bg-orange-500"
-              onClick={toggleWalletModal}
+              onClick={() => setDisplayWalletConnectModal(true)}
             >
               Connect
             </button>
           )}
-          {/* Wallet Modal */}
-          <ConnectWallet openModal={openWalletModal} closeModal={toggleWalletModal} />
         </div>
       </nav>
 
@@ -121,7 +115,7 @@ export function Header() {
               <div className="py-6">
                 {!activeAddress ? (
                   <button
-                    onClick={toggleWalletModal}
+                    onClick={() => setDisplayWalletConnectModal(true)}
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-gray-900 hover:bg-gray-50"
                   >
                     Connect
