@@ -7,13 +7,7 @@ interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
   const [openWalletModal, setOpenWalletModal] = useState<boolean>(false)
-  const [openDemoModal, setOpenDemoModal] = useState<boolean>(false)
-  const [appCallsDemoModal, setAppCallsDemoModal] = useState<boolean>(false)
   const { activeAddress } = useWallet()
-
-  const toggleWalletModal = () => setOpenWalletModal(!openWalletModal)
-  const toggleDemoModal = () => setOpenDemoModal(!openDemoModal)
-  const toggleAppCallsModal = () => setAppCallsDemoModal(!appCallsDemoModal)
 
   return (
     <div className="">
@@ -27,30 +21,6 @@ const Home: React.FC<HomeProps> = () => {
         <main className="flex flex-col gap-10 row-start-2 items-center mt-10 ">
           <Swapper />
         </main>
-
-        {/* Wallet Connection UI / Transaction Demo / App Call
-      <div className="flex flex-col items-center mt-10">
-        <button data-test-id="connect-wallet" className="btn m-2" onClick={toggleWalletModal}>
-          Wallet Connection
-        </button>
-
-        {activeAddress && (
-          <button data-test-id="transactions-demo" className="btn m-2" onClick={toggleDemoModal}>
-            Transactions Demo
-          </button>
-        )}
-
-        {activeAddress && (
-          <button data-test-id="appcalls-demo" className="btn m-2" onClick={toggleAppCallsModal}>
-            Contract Interactions Demo
-          </button>
-        )}
-
-        <ConnectWallet openModal={openWalletModal} closeModal={toggleWalletModal} />
-        <Transact openModal={openDemoModal} setModalState={setOpenDemoModal} />
-        <AppCalls openModal={appCallsDemoModal} setModalState={setAppCallsDemoModal} />
-      </div>
-      */}
       </div>
     </div>
   )
