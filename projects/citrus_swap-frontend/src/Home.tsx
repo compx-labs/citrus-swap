@@ -1,14 +1,10 @@
-import { useWallet } from '@txnlab/use-wallet'
-import React, { useState } from 'react'
+import React from 'react'
 import { Header } from './components/header'
 import { Swapper } from './components/swapper'
 
 interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
-  const [openWalletModal, setOpenWalletModal] = useState<boolean>(false)
-  const { activeAddress } = useWallet()
-
   return (
     <div className="">
       <Header />

@@ -1,7 +1,7 @@
 'use client'
 
 import { Dialog } from '@headlessui/react'
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 import { useContext, useState } from 'react'
 import { FaBars, FaTimes } from 'react-icons/fa'
 import { WalletContext } from '../context/wallet'
@@ -18,17 +18,17 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // Wallet information
-  const { activeAddress, providers } = useWallet()
+  const { activeAddress, wallets } = useWallet()
 
   const { setDisplayWalletConnectModal, displayWalletConnectModal } = useContext(WalletContext)
   // Toggle functions
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
 
   const disconnectWallet = () => {
-    if (providers) {
-      for (const provider of providers) {
-        if (provider.isActive) {
-          provider.disconnect()
+    if (wallets) {
+      for (const wallet of wallets) {
+        if (wallet.isActive && wallet.isConnected) {
+          wallet.disconnect()
         }
       }
     }
