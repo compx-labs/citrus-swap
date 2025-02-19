@@ -1,4 +1,4 @@
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 import React, { useState } from 'react'
 import { Header } from './components/header'
 import { Swapper } from './components/swapper'

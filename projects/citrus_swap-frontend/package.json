@@ -42,6 +42,7 @@
     "@txnlab/use-wallet-react": "^3.12.0",
     "algosdk": ">=2.9.0 <3.0",
     "daisyui": "^4.0.0",
+    "ldrs": "^1.0.2",
     "notistack": "^3.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

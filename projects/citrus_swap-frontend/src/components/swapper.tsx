@@ -4,7 +4,7 @@ import { ArrowsUpDownIcon } from '@heroicons/react/24/outline'
 import { LayoutGroup, motion } from 'framer-motion'
 import { useState } from 'react'
 import { ALGO_ASSET_ID, ORA_ASSET_ID } from '../constants'
-import { SwapButton } from './SwapButton'
+import { SwapButton } from './swapButton'
 import { SwapInput } from './swapInput'
 
 export const Swapper: React.FC = () => {
