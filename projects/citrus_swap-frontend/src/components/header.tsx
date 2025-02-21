@@ -5,7 +5,7 @@ import { Dialog } from '@headlessui/react'
 import { useWallet } from '@txnlab/use-wallet'
 import { useSnackbar } from 'notistack'
 import { useContext, useEffect, useState } from 'react'
-import { FaBars, FaTimes } from 'react-icons/fa'
+import { FaTimes } from 'react-icons/fa'
 import { WalletContext } from '../context/wallet'
 import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 
@@ -13,7 +13,7 @@ import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClien
 const navigation = [
   { name: 'Docs', href: '#' },
   { name: 'Liquidity', href: '#' },
-  { name: 'Social', href: '#' },
+  { name: 'Join Our Community', href: 'https://discord.gg/CCC22er4DQ' },
 ]
 
 // ORA asset ID
@@ -125,7 +125,12 @@ export function Header() {
         {/* Desktop Navigation Links */}
         <div className="hidden lg:flex lg:gap-x-12 items-center">
           {navigation.map((item) => (
-            <a key={item.name} href={item.href} className="text-lg font-Bari text-orange-400 hover:text-orange-600">
+            <a
+              key={item.name}
+              href={item.href}
+              target={item.name === 'Join Our Community' ? '_blank' : '_self'}
+              className="text-lg font-Bari text-orange-400 hover:text-orange-600"
+            >
               {item.name}
             </a>
           ))}
@@ -191,6 +196,7 @@ export function Header() {
                   <a
                     key={item.name}
                     href={item.href}
+                    target={item.name === 'Social' ? '_blank' : '_self'} // Opens 'Social' link in a new tab
                     className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50"
                   >
                     {item.name}
