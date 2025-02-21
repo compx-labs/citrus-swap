@@ -10,6 +10,7 @@ import { WalletContext } from '../context/wallet'
 
 import { LoadingContext } from '../context/loading'
 import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
+import AnimButton from './animButton'
 
 // Navigation links
 const navigation = [
@@ -173,21 +174,13 @@ export function Header() {
 
           {/* Connect Wallet Button */}
           {activeAccount ? (
-            <button
-              data-test-id="connect-wallet"
-              className="bg-orange-400 rounded-full text-lime-300 px-6 py-2 text-2xl font-semibold shadow-lg hover:bg-orange-500"
-              onClick={disconnectWallet}
-            >
+            <AnimButton data-test-id="connect-wallet" onClick={disconnectWallet}>
               Disconnect
-            </button>
+            </AnimButton>
           ) : (
-            <button
-              data-test-id="connect-wallet"
-              className="bg-orange-400 rounded-full text-lime-300 px-6 py-2 text-2xl font-semibold shadow-lg hover:bg-orange-500"
-              onClick={() => setDisplayWalletConnectModal(true)}
-            >
+            <AnimButton data-test-id="connect-wallet" onClick={() => setDisplayWalletConnectModal(true)}>
               Connect
-            </button>
+            </AnimButton>
           )}
         </div>
       </nav>
