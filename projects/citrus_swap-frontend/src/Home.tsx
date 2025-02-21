@@ -1,7 +1,7 @@
 import { useWallet } from '@txnlab/use-wallet'
 import React, { useEffect, useState } from 'react'
-import Transact from './components/Transact'
 import { Header } from './components/header'
+import Transact from './components/oraSimpleTxn'
 import { Swapper } from './components/swapper'
 
 interface HomeProps {}

@@ -9,7 +9,7 @@ interface TransactInterface {
   setModalState: (value: boolean) => void
 }
 
-const ASSET_ID = BigInt(513945448) // mainnet: 1284444444
+const ASSET_ID = BigInt(1284444444) // mainnet: 1284444444 testnet: 513945448
 
 const Transact = ({ openModal, setModalState }: TransactInterface) => {
   const [loading, setLoading] = useState<boolean>(false)
@@ -41,7 +41,7 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
       enqueueSnackbar('Sending ORA transaction...', { variant: 'info' })
 
       // Convert amount (in ORA) to micro-ORA (1 ORA = 10^8 micro-ORA)
-      const amountInMicroORA = BigInt(parseFloat(amount) * 10 ** 6) // NOTE 10^6 for testnet ORA 6 decimals
+      const amountInMicroORA = BigInt(parseFloat(amount) * 10 ** 8) // NOTE 10^6 for testnet ORA 6 decimals
 
       const result = await algorand.send.assetTransfer({
         signer: signer,
@@ -81,7 +81,7 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           min="0"
-          step="0.1" 
+          step="0.1"
         />
 
         <div className="modal-action">
