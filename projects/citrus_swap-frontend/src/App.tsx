@@ -1,3 +1,4 @@
+import { NetworkId, WalletId, WalletManager } from '@txnlab/use-wallet-react'
 import { SnackbarProvider } from 'notistack'
 import Home from './Home'
 import RootLayout from './components/RootLayout'
@@ -5,14 +6,17 @@ import { WalletConnectionModal } from './components/walletConnectModal'
 import { WalletContextProvider } from './context/wallet'
 import { getAlgodConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
 
-import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-react'
+import { WalletProvider } from '@txnlab/use-wallet-react'
 
 export default function App() {
   const algodConfig = getAlgodConfigFromViteEnvironment()
 
-  const manager = new WalletManager({
-    wallets: [WalletId.PERA, WalletId.DEFLY],
-    defaultNetwork: NetworkId.MAINNET, // or just 'mainnet'
+  const walletManager = new WalletManager({
+    wallets: [WalletId.DEFLY, WalletId.PERA],
+    network: NetworkId.MAINNET,
+    options: {
+      debug: true,
+    },
   })
 
   return (
