@@ -1,4 +1,4 @@
-import { NetworkId, WalletId, WalletManager } from '@txnlab/use-wallet-react'
+import { WalletId, WalletManager } from '@txnlab/use-wallet-react'
 import { SnackbarProvider } from 'notistack'
 import Home from './Home'
 import RootLayout from './components/RootLayout'
@@ -13,7 +13,6 @@ export default function App() {
 
   const walletManager = new WalletManager({
     wallets: [WalletId.DEFLY, WalletId.PERA],
-    network: NetworkId.MAINNET,
     options: {
       debug: true,
     },
@@ -22,7 +21,7 @@ export default function App() {
   return (
     <RootLayout>
       <SnackbarProvider maxSnack={3}>
-        <WalletProvider manager={manager}>
+        <WalletProvider manager={walletManager}>
           <WalletContextProvider>
             <Home />
             <WalletConnectionModal />

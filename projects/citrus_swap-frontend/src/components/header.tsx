@@ -5,7 +5,6 @@ import { useWallet } from '@txnlab/use-wallet-react'
 import { useContext, useEffect, useState } from 'react'
 import { FaBars, FaTimes } from 'react-icons/fa'
 import { WalletContext } from '../context/wallet'
-import { fetchWalletInfo } from '../services/getWalletInfo'
 
 // Navigation links
 const navigation = [
