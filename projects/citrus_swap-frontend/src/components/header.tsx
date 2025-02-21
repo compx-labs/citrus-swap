@@ -1,17 +1,13 @@
-'use client'
-
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { Dialog } from '@headlessui/react'
 import { useWallet } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
 import { useSnackbar } from 'notistack'
 import { useContext, useEffect, useState } from 'react'
-import { FaBars, FaTimes } from 'react-icons/fa'
+import { FaTimes } from 'react-icons/fa'
 import { ORA_ASSET_ID, ORA_ASSET_INFO } from '../constants'
 import { WalletContext } from '../context/wallet'
-import { getAlgoConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 
-import { WalletContext } from '../context/wallet'
 import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 
 // Navigation links
@@ -26,8 +22,13 @@ const ASSET_ID = BigInt(1284444444) // mainnet: 1284444444 testnet: 513945448
 
 export function Header() {
   const [loading, setLoading] = useState(false)
-  const { signer, activeAddress, providers } = useWallet()
   const { enqueueSnackbar } = useSnackbar()
+  // State for managing mobile menu visibility
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { activeAccount, transactionSigner } = useWallet()
+
+  // Wallet information
+  const { activeAddress, wallets } = useWallet()
 
   // Get Algorand client config
   const algodConfig = getAlgodConfigFromViteEnvironment()
@@ -70,7 +71,7 @@ export function Header() {
 
   // Opt-in to the asset
   const optInOra = async () => {
-    if (!signer || !activeAddress) {
+    if (!transactionSigner || !activeAddress) {
       enqueueSnackbar('Please connect your wallet first', { variant: 'warning' })
       return
     }
@@ -81,7 +82,7 @@ export function Header() {
 
       // Send the opt-in transaction
       const result = await algorand.send.assetTransfer({
-        signer: signer,
+        signer: transactionSigner,
         sender: activeAddress,
         receiver: activeAddress, // Opt-in to the asset by sending to the same address
         assetId: ASSET_ID,
@@ -96,13 +97,6 @@ export function Header() {
 
     setLoading(false)
   }
-
-  // State for managing mobile menu visibility
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { activeAccount } = useWallet()
-
-  // Wallet information
-  const { activeAddress, wallets } = useWallet()
 
   const { setDisplayWalletConnectModal, displayWalletConnectModal, setAddress, setAlgoBalance, setOrangeBalance } =
     useContext(WalletContext)

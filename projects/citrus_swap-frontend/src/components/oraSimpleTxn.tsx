@@ -1,5 +1,5 @@
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
@@ -20,12 +20,12 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
   const algorand = AlgorandClient.fromConfig({ algodConfig })
 
   const { enqueueSnackbar } = useSnackbar()
-  const { signer, activeAddress } = useWallet()
+  const { transactionSigner, activeAddress } = useWallet()
 
   const handleSubmitORA = async () => {
     setLoading(true)
 
-    if (!signer || !activeAddress) {
+    if (!transactionSigner || !activeAddress) {
       enqueueSnackbar('Please connect wallet first', { variant: 'warning' })
       setLoading(false)
       return
@@ -44,7 +44,7 @@ const Transact = ({ openModal, setModalState }: TransactInterface) => {
       const amountInMicroORA = BigInt(parseFloat(amount) * 10 ** 8) // NOTE 10^6 for testnet ORA 6 decimals
 
       const result = await algorand.send.assetTransfer({
-        signer: signer,
+        signer: transactionSigner,
         sender: activeAddress,
         receiver: receiverAddress,
         assetId: ASSET_ID,
