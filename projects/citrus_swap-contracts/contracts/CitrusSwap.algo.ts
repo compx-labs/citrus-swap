@@ -1,57 +1,52 @@
 import { Contract } from '@algorandfoundation/tealscript';
 
 export class CitrusSwap extends Contract {
-  /**
-   * Calculates the sum of two numbers
-   *
-   * @param a
-   * @param b
-   * @returns The sum of a and b
-   */
-  private getSum(a: uint64, b: uint64): uint64 {
-    return a + b;
+  programVersion = 10;
+
+  // Global State Variables
+
+  asset1Id = GlobalStateKey<uint64>();
+
+  asset2Id = GlobalStateKey<uint64>();
+
+  lpAssetId = GlobalStateKey<uint64>();
+
+  asset1Reserve = GlobalStateKey<uint64>();
+
+  asset2Reserve = GlobalStateKey<uint64>();
+
+  totalAsset1 = GlobalStateKey<uint64>();
+
+  totalAsset2 = GlobalStateKey<uint64>();
+
+  adminAddress = GlobalStateKey<Address>();
+
+  treasuryAddress = GlobalStateKey<Address>();
+
+  creatApplication(adminAddress: Address, treasuryAddress: Address, asset1Id: uint64, asset2Id: uint64): void {
+    this.adminAddress.value = adminAddress;
+    this.treasuryAddress.value = treasuryAddress;
+    this.asset1Id.value = asset1Id;
+    this.asset2Id.value = asset2Id;
+    this.asset1Reserve.value = 0;
+    this.asset2Reserve.value = 0;
+    this.totalAsset1.value = 0;
+    this.totalAsset2.value = 0;
   }
 
-  /**
-   * Calculates the difference between two numbers
-   *
-   * @param a
-   * @param b
-   * @returns The difference between a and b.
-   */
-  private getDifference(a: uint64, b: uint64): uint64 {
-    return a >= b ? a - b : b - a;
+  initApplication(payTxn: PayTxn): void {
+    verifyPayTxn(payTxn, { receiver: this.app.address, amount: 300_000 });
+    sendAssetTransfer({
+      xferAsset: AssetID.fromUint64(this.asset1Id.value),
+      assetReceiver: this.app.address,
+      assetAmount: 0,
+    });
+    sendAssetTransfer({
+      xferAsset: AssetID.fromUint64(this.asset2Id.value),
+      assetReceiver: this.app.address,
+      assetAmount: 0,
+    });
   }
 
-  /**
-   * A method that takes two numbers and does either addition or subtraction
-   *
-   * @param a The first uint64
-   * @param b The second uint64
-   * @param operation The operation to perform. Can be either 'sum' or 'difference'
-   *
-   * @returns The result of the operation
-   */
-  doMath(a: uint64, b: uint64, operation: string): uint64 {
-    let result: uint64;
-
-    if (operation === 'sum') {
-      result = this.getSum(a, b);
-    } else if (operation === 'difference') {
-      result = this.getDifference(a, b);
-    } else throw Error('Invalid operation');
-
-    return result;
-  }
-
-  /**
-   * A demonstration method used in the AlgoKit fullstack template.
-   * Greets the user by name.
-   *
-   * @param name The name of the user to greet.
-   * @returns A greeting message to the user.
-   */
-  hello(name: string): string {
-    return 'Hello, ' + name;
-  }
+  gas(): void {}
 }
