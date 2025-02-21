@@ -44,7 +44,6 @@ export function Header() {
     setAlgoBalance(Number(accountInfo.amount / 10n ** 6n))
     setOrangeBalance(Number((assetBalance.assetHolding?.amount || 0n) / 10n ** ORA_ASSET_INFO.params.decimals))
     setAddress(address)
-    console.log('settings set')
   }
 
   useEffect(() => {
