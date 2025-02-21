@@ -10,7 +10,7 @@ interface AssetInfo {
   params: {
     clawback: string
     creator: string
-    decimals: number
+    decimals: bigint
     defaultFrozen: boolean
     freeze: string
     manager: string
@@ -32,7 +32,7 @@ export const ORA_ASSET_INFO: AssetInfo = {
   params: {
     clawback: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ',
     creator: 'JP3ENKDQC2BOYRMLFGKBS7RB2IVNF7VNHCFHVTRNHOENRQ6R4UN7MCNXPI',
-    decimals: 8,
+    decimals: 8n,
     defaultFrozen: false,
     freeze: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ',
     manager: 'JP3ENKDQC2BOYRMLFGKBS7RB2IVNF7VNHCFHVTRNHOENRQ6R4UN7MCNXPI',
@@ -54,7 +54,7 @@ export const ALGO_ASSET_INFO: AssetInfo = {
   params: {
     clawback: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ',
     creator: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ',
-    decimals: 6,
+    decimals: 6n,
     defaultFrozen: false,
     freeze: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ',
     manager: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ',

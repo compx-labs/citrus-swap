@@ -1,10 +1,11 @@
-'use client'
-
 import { Dialog } from '@headlessui/react'
 import { useWallet } from '@txnlab/use-wallet-react'
+import algosdk from 'algosdk'
 import { useContext, useEffect, useState } from 'react'
 import { FaBars, FaTimes } from 'react-icons/fa'
+import { ORA_ASSET_ID, ORA_ASSET_INFO } from '../constants'
 import { WalletContext } from '../context/wallet'
+import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 
 // Navigation links
 const navigation = [
@@ -21,7 +22,8 @@ export function Header() {
   // Wallet information
   const { activeAddress, wallets } = useWallet()
 
-  const { setDisplayWalletConnectModal, displayWalletConnectModal } = useContext(WalletContext)
+  const { setDisplayWalletConnectModal, displayWalletConnectModal, setAddress, setAlgoBalance, setOrangeBalance } =
+    useContext(WalletContext)
   // Toggle functions
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
 
@@ -34,6 +36,17 @@ export function Header() {
       }
     }
   }
+  async function fetchWalletInfo(address: string) {
+    const algodConfig = getAlgodConfigFromViteEnvironment()
+    const algod: algosdk.Algodv2 = new algosdk.Algodv2('', algodConfig.server, algodConfig.port)
+    const accountInfo = await algod.accountInformation(address).do()
+    const assetBalance = await algod.accountAssetInformation(address, ORA_ASSET_ID).do()
+    setAlgoBalance(Number(accountInfo.amount / 10n ** 6n))
+    setOrangeBalance(Number((assetBalance.assetHolding?.amount || 0n) / 10n ** ORA_ASSET_INFO.params.decimals))
+    setAddress(address)
+    console.log('settings set')
+  }
+
   useEffect(() => {
     async function fetchWallet(address: string) {
       await fetchWalletInfo(address)
@@ -144,4 +157,7 @@ export function Header() {
       </Dialog>
     </header>
   )
+}
+function setAlgoBalance(arg0: number) {
+  throw new Error('Function not implemented.')
 }
