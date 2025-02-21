@@ -6,6 +6,7 @@ import { WalletContextProvider } from './context/wallet'
 import { getAlgodConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
 
 import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-react'
+import { LoadingModal } from './components/loadingModal'
 import { LoadingContextProvider } from './context/loading'
 
 const manager = new WalletManager({
@@ -30,6 +31,7 @@ export default function App() {
           <WalletContextProvider>
             <LoadingContextProvider>
               <Home />
+              <LoadingModal />
             </LoadingContextProvider>
             <WalletConnectionModal />
           </WalletContextProvider>
