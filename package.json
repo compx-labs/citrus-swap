@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@deflex/deflex-sdk-js": "^2.0.5",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "framer-motion": "^12.4.2",

@@ -1,8 +1,17 @@
 // src/constants.ts
+
+// Asset IDs for ORA and ALGO
 export const ORA_ASSET_ID = 1284444444
 export const ALGO_ASSET_ID = 0
-export const COMPX_API_URL = 'https://api.compx.io/api'
+export const COMPX_API_URL = 'https://api-general.compx.io/api'
 
+// ENV object to hold API URLs and keys
+export const ENV = {
+  ALGOD_API_URL: 'https://mainnet-api.algonode.cloud',
+  DEFLEX_API_KEY: '83a2c3c1-e15b-480c-9d0a-212ae70d9d57',
+}
+
+// Asset Info interface to describe asset structure
 interface AssetInfo {
   'created-at-round': number
   deleted: boolean
@@ -25,6 +34,7 @@ interface AssetInfo {
   }
 }
 
+// ORA asset info
 export const ORA_ASSET_INFO: AssetInfo = {
   'created-at-round': 34632901,
   deleted: false,
@@ -47,6 +57,7 @@ export const ORA_ASSET_INFO: AssetInfo = {
   },
 }
 
+// ALGO asset info
 export const ALGO_ASSET_INFO: AssetInfo = {
   'created-at-round': 0,
   deleted: false,
@@ -69,6 +80,7 @@ export const ALGO_ASSET_INFO: AssetInfo = {
   },
 }
 
+// Map to store Asset Info for easy lookup
 export const ASSET_INFO: { [key: number]: AssetInfo } = {
   [ORA_ASSET_ID]: ORA_ASSET_INFO,
   [ALGO_ASSET_ID]: ALGO_ASSET_INFO,
