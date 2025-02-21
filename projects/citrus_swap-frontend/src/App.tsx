@@ -6,6 +6,7 @@ import { WalletContextProvider } from './context/wallet'
 import { getAlgodConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
 
 import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-react'
+import { LoadingContextProvider } from './context/loading'
 
 const manager = new WalletManager({
   wallets: [WalletId.PERA, WalletId.DEFLY],
@@ -27,7 +28,9 @@ export default function App() {
       <SnackbarProvider maxSnack={3}>
         <WalletProvider manager={manager}>
           <WalletContextProvider>
-            <Home />
+            <LoadingContextProvider>
+              <Home />
+            </LoadingContextProvider>
             <WalletConnectionModal />
           </WalletContextProvider>
         </WalletProvider>
