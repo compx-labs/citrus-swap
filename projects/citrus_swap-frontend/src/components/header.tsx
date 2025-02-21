@@ -8,7 +8,9 @@ import { FaTimes } from 'react-icons/fa'
 import { ORA_ASSET_ID, ORA_ASSET_INFO } from '../constants'
 import { WalletContext } from '../context/wallet'
 
+import { LoadingContext } from '../context/loading'
 import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
+import AnimButton from './animButton'
 
 // Navigation links
 const navigation = [
@@ -17,11 +19,8 @@ const navigation = [
   { name: 'Join Our Community', href: 'https://discord.gg/CCC22er4DQ' },
 ]
 
-// ORA asset ID
-const ASSET_ID = BigInt(1284444444) // mainnet: 1284444444 testnet: 513945448
-
 export function Header() {
-  const [loading, setLoading] = useState(false)
+  const { loading, setLoading, setTitle, setSecondaryText } = useContext(LoadingContext)
   const { enqueueSnackbar } = useSnackbar()
   // State for managing mobile menu visibility
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -33,7 +32,6 @@ export function Header() {
   // Get Algorand client config
   const algodConfig = getAlgodConfigFromViteEnvironment()
   const algorand = AlgorandClient.fromConfig({ algodConfig })
-
   // Check if the active address has opted into ORA
   const checkIfOptedIn = async () => {
     if (!activeAddress) {
@@ -46,7 +44,7 @@ export function Header() {
       const holdings = accountInfo.assets || []
 
       // Check if the address has opted in to the ORA asset by checking assetId
-      const hasOptedIn = holdings.some((asset) => asset.assetId == ASSET_ID)
+      const hasOptedIn = holdings.some((asset) => asset.assetId == BigInt(ORA_ASSET_ID))
       return hasOptedIn
     } catch (e) {
       enqueueSnackbar('Failed to check asset holdings', { variant: 'error' })
@@ -85,7 +83,7 @@ export function Header() {
         signer: transactionSigner,
         sender: activeAddress,
         receiver: activeAddress, // Opt-in to the asset by sending to the same address
-        assetId: ASSET_ID,
+        assetId: BigInt(ORA_ASSET_ID),
         amount: BigInt(0), // Zero amount for opt-in
       })
 
@@ -127,7 +125,9 @@ export function Header() {
       await fetchWalletInfo(address)
     }
     if (activeAccount) {
-      fetchWallet(activeAccount.address)
+      fetchWallet(activeAccount.address).then(() => {
+        setLoading(false)
+      })
     }
   }, [displayWalletConnectModal])
 
@@ -174,21 +174,13 @@ export function Header() {
 
           {/* Connect Wallet Button */}
           {activeAccount ? (
-            <button
-              data-test-id="connect-wallet"
-              className="bg-orange-400 rounded-full text-lime-300 px-6 py-2 text-2xl font-semibold shadow-lg hover:bg-orange-500"
-              onClick={disconnectWallet}
-            >
+            <AnimButton data-test-id="connect-wallet" onClick={disconnectWallet}>
               Disconnect
-            </button>
+            </AnimButton>
           ) : (
-            <button
-              data-test-id="connect-wallet"
-              className="bg-orange-400 rounded-full text-lime-300 px-6 py-2 text-2xl font-semibold shadow-lg hover:bg-orange-500"
-              onClick={() => setDisplayWalletConnectModal(true)}
-            >
+            <AnimButton data-test-id="connect-wallet" onClick={() => setDisplayWalletConnectModal(true)}>
               Connect
-            </button>
+            </AnimButton>
           )}
         </div>
       </nav>
@@ -249,7 +241,4 @@ export function Header() {
       </Dialog>
     </header>
   )
-}
-function setAlgoBalance(arg0: number) {
-  throw new Error('Function not implemented.')
 }

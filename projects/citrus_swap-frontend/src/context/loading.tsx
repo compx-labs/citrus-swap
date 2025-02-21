@@ -7,17 +7,14 @@ interface LoadingContextType {
   setLoading: (value: boolean) => void
   secondaryText: string
   setSecondaryText: (value: string) => void
-  displayLoadingModal: boolean
-  setDisplayLoadingModal: (value: boolean) => void
 }
 
 const LoadingContext = createContext<LoadingContextType>({} as LoadingContextType)
 
 const LoadingContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [title, setTitle] = useState<string>('')
+  const [title, setTitle] = useState<string>('Loading...')
   const [loading, setLoading] = useState<boolean>(false)
   const [secondaryText, setSecondaryText] = useState<string>('')
-  const [displayLoadingModal, setDisplayLoadingModal] = useState<boolean>(false)
 
   return (
     <LoadingContext.Provider
@@ -28,8 +25,6 @@ const LoadingContextProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setLoading,
         secondaryText,
         setSecondaryText,
-        displayLoadingModal,
-        setDisplayLoadingModal,
       }}
     >
       {children}
