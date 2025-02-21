@@ -2,21 +2,15 @@ import { useWallet } from '@txnlab/use-wallet-react'
 import React, { useContext } from 'react'
 import { RxCross1 } from 'react-icons/rx'
 import { WalletContext } from '../context/wallet'
-import { fetchWalletInfo } from '../services/getWalletInfo'
 
 export const WalletConnectionModal: React.FC = () => {
   const { wallets, activeAccount } = useWallet()
   const { displayWalletConnectModal, setDisplayWalletConnectModal } = useContext(WalletContext)
 
   async function handleOnConnect(wallet: any) {
-    console.log('wallet', wallet)
-    await wallet.connect()
-    if (wallet.isConnected) {
-      await fetchWalletInfo(activeAccount?.address as string)
+    wallet.connect().then(async (response: any) => {
       setDisplayWalletConnectModal(false)
-    } else {
-      setDisplayWalletConnectModal(false)
-    }
+    })
   }
 
   return displayWalletConnectModal ? (

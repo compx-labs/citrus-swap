@@ -2,9 +2,10 @@
 
 import { Dialog } from '@headlessui/react'
 import { useWallet } from '@txnlab/use-wallet-react'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { FaBars, FaTimes } from 'react-icons/fa'
 import { WalletContext } from '../context/wallet'
+import { fetchWalletInfo } from '../services/getWalletInfo'
 
 // Navigation links
 const navigation = [
@@ -16,6 +17,7 @@ const navigation = [
 export function Header() {
   // State for managing mobile menu visibility
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { activeAccount } = useWallet()
 
   // Wallet information
   const { activeAddress, wallets } = useWallet()
@@ -33,6 +35,14 @@ export function Header() {
       }
     }
   }
+  useEffect(() => {
+    async function fetchWallet(address: string) {
+      await fetchWalletInfo(address)
+    }
+    if (activeAccount) {
+      fetchWallet(activeAccount.address)
+    }
+  }, [displayWalletConnectModal])
 
   return (
     <header className="bg-white">
