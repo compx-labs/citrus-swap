@@ -2,10 +2,15 @@
 
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { Dialog } from '@headlessui/react'
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
+import algosdk from 'algosdk'
 import { useSnackbar } from 'notistack'
 import { useContext, useEffect, useState } from 'react'
-import { FaTimes } from 'react-icons/fa'
+import { FaBars, FaTimes } from 'react-icons/fa'
+import { ORA_ASSET_ID, ORA_ASSET_INFO } from '../constants'
+import { WalletContext } from '../context/wallet'
+import { getAlgoConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
+
 import { WalletContext } from '../context/wallet'
 import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 
@@ -94,20 +99,44 @@ export function Header() {
 
   // State for managing mobile menu visibility
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { activeAccount } = useWallet()
 
-  const { setDisplayWalletConnectModal, displayWalletConnectModal } = useContext(WalletContext)
+  // Wallet information
+  const { activeAddress, wallets } = useWallet()
+
+  const { setDisplayWalletConnectModal, displayWalletConnectModal, setAddress, setAlgoBalance, setOrangeBalance } =
+    useContext(WalletContext)
   // Toggle functions
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
 
   const disconnectWallet = () => {
-    if (providers) {
-      for (const provider of providers) {
-        if (provider.isActive) {
-          provider.disconnect()
+    if (wallets) {
+      for (const wallet of wallets) {
+        if (wallet.isActive && wallet.isConnected) {
+          wallet.disconnect()
         }
       }
     }
   }
+  async function fetchWalletInfo(address: string) {
+    const algodConfig = getAlgodConfigFromViteEnvironment()
+    const algod: algosdk.Algodv2 = new algosdk.Algodv2('', algodConfig.server, algodConfig.port)
+    const accountInfo = await algod.accountInformation(address).do()
+    const assetBalance = await algod.accountAssetInformation(address, ORA_ASSET_ID).do()
+    setAlgoBalance(Number(accountInfo.amount / 10n ** 6n))
+    setOrangeBalance(Number((assetBalance.assetHolding?.amount || 0n) / 10n ** ORA_ASSET_INFO.params.decimals))
+    setAddress(address)
+    console.log('settings set')
+  }
+
+  useEffect(() => {
+    async function fetchWallet(address: string) {
+      await fetchWalletInfo(address)
+    }
+    if (activeAccount) {
+      fetchWallet(activeAccount.address)
+    }
+  }, [displayWalletConnectModal])
 
   return (
     <header className="bg-white">
@@ -151,7 +180,7 @@ export function Header() {
           )}
 
           {/* Connect Wallet Button */}
-          {activeAddress ? (
+          {activeAccount ? (
             <button
               data-test-id="connect-wallet"
               className="bg-orange-400 rounded-full text-lime-300 px-6 py-2 text-2xl font-semibold shadow-lg hover:bg-orange-500"
@@ -205,7 +234,7 @@ export function Header() {
               </div>
               {/* Wallet Button */}
               <div className="py-6">
-                {!activeAddress ? (
+                {!activeAccount ? (
                   <button
                     onClick={() => setDisplayWalletConnectModal(true)}
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-gray-900 hover:bg-gray-50"
@@ -227,4 +256,7 @@ export function Header() {
       </Dialog>
     </header>
   )
+}
+function setAlgoBalance(arg0: number) {
+  throw new Error('Function not implemented.')
 }
