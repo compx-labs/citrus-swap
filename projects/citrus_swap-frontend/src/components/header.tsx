@@ -1,10 +1,11 @@
-'use client'
-
 import { Dialog } from '@headlessui/react'
 import { useWallet } from '@txnlab/use-wallet-react'
-import { useContext, useState } from 'react'
+import algosdk from 'algosdk'
+import { useContext, useEffect, useState } from 'react'
 import { FaBars, FaTimes } from 'react-icons/fa'
+import { ORA_ASSET_ID, ORA_ASSET_INFO } from '../constants'
 import { WalletContext } from '../context/wallet'
+import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 
 // Navigation links
 const navigation = [
@@ -16,23 +17,44 @@ const navigation = [
 export function Header() {
   // State for managing mobile menu visibility
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { activeAccount } = useWallet()
 
   // Wallet information
-  const { activeAccount, wallets } = useWallet()
+  const { activeAddress, wallets } = useWallet()
 
-  const { setDisplayWalletConnectModal, displayWalletConnectModal } = useContext(WalletContext)
+  const { setDisplayWalletConnectModal, displayWalletConnectModal, setAddress, setAlgoBalance, setOrangeBalance } =
+    useContext(WalletContext)
   // Toggle functions
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
 
   const disconnectWallet = () => {
     if (wallets) {
       for (const wallet of wallets) {
-        if (wallet.isActive) {
+        if (wallet.isActive && wallet.isConnected) {
           wallet.disconnect()
         }
       }
     }
   }
+  async function fetchWalletInfo(address: string) {
+    const algodConfig = getAlgodConfigFromViteEnvironment()
+    const algod: algosdk.Algodv2 = new algosdk.Algodv2('', algodConfig.server, algodConfig.port)
+    const accountInfo = await algod.accountInformation(address).do()
+    const assetBalance = await algod.accountAssetInformation(address, ORA_ASSET_ID).do()
+    setAlgoBalance(Number(accountInfo.amount / 10n ** 6n))
+    setOrangeBalance(Number((assetBalance.assetHolding?.amount || 0n) / 10n ** ORA_ASSET_INFO.params.decimals))
+    setAddress(address)
+    console.log('settings set')
+  }
+
+  useEffect(() => {
+    async function fetchWallet(address: string) {
+      await fetchWalletInfo(address)
+    }
+    if (activeAccount) {
+      fetchWallet(activeAccount.address)
+    }
+  }, [displayWalletConnectModal])
 
   return (
     <header className="bg-white">
@@ -135,4 +157,7 @@ export function Header() {
       </Dialog>
     </header>
   )
+}
+function setAlgoBalance(arg0: number) {
+  throw new Error('Function not implemented.')
 }
