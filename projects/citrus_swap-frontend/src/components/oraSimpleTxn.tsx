@@ -9,13 +9,13 @@ import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClien
 interface TransactInterface {
   openModal: boolean
   setModalState: (value: boolean) => void
-  triggerNotification: (message: string, type: 'success' | 'error' | 'info') => void // Add triggerNotification function
+  triggerNotification: (message: string, type: 'success' | 'error' | 'info') => void
 }
 
 const Transact = ({ openModal, setModalState, triggerNotification }: TransactInterface) => {
   const [loading, setLoading] = useState<boolean>(false)
   const [receiverAddress, setReceiverAddress] = useState<string>('')
-  const [amount, setAmount] = useState<string>('') // User input for amount
+  const [amount, setAmount] = useState<string>('')
   const [transactionStatus, setTransactionStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [transactionMessage, setTransactionMessage] = useState('')
 
@@ -23,6 +23,16 @@ const Transact = ({ openModal, setModalState, triggerNotification }: TransactInt
   const algorand = AlgorandClient.fromConfig({ algodConfig })
 
   const { transactionSigner, activeAddress } = useWallet()
+
+  const resolveNFD = async (nfd: string): Promise<{ owner?: string } | null> => {
+    try {
+      const response = await fetch(`https://api.nf.domains/nfd/${nfd}`)
+      const data = await response.json()
+      return data.owner ? { owner: data.owner } : null
+    } catch (error) {
+      return null
+    }
+  }
 
   const handleSubmitORA = async () => {
     setLoading(true)
@@ -41,16 +51,28 @@ const Transact = ({ openModal, setModalState, triggerNotification }: TransactInt
       return
     }
 
+    let resolvedAddress = receiverAddress
+
+    if (receiverAddress.endsWith('.algo')) {
+      triggerNotification('Resolving NFD...', 'info')
+      const nfdData = await resolveNFD(receiverAddress)
+      if (!nfdData?.owner) {
+        triggerNotification('Could not resolve NFD owner', 'error')
+        setLoading(false)
+        return
+      }
+      resolvedAddress = nfdData.owner
+      triggerNotification(`NFD resolved to: ${resolvedAddress}`, 'info')
+    }
+
     try {
       triggerNotification('Sending ORA transaction...', 'info')
-
-      // Convert amount (in ORA) to micro-ORA (1 ORA = 10^8 micro-ORA)
-      const amountInMicroORA = BigInt(parseFloat(amount) * 10 ** 8) // NOTE 10^6 for testnet ORA 6 decimals
+      const amountInMicroORA = BigInt(parseFloat(amount) * 10 ** 8)
 
       const result = await algorand.send.assetTransfer({
         signer: transactionSigner,
         sender: activeAddress,
-        receiver: receiverAddress,
+        receiver: resolvedAddress,
         assetId: BigInt(ORA_ASSET_ID),
         amount: amountInMicroORA,
       })
@@ -60,27 +82,16 @@ const Transact = ({ openModal, setModalState, triggerNotification }: TransactInt
       triggerNotification(notificationMessage, 'success')
 
       setReceiverAddress('')
-      setAmount('') // Reset input fields
-
-      // Trigger confetti on success
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { x: 0.5, y: 0.5 },
-      })
-
-      // Update status to success
+      setAmount('')
+      confetti({ particleCount: 100, spread: 70, origin: { x: 0.5, y: 0.5 } })
       setTransactionStatus('success')
       setTransactionMessage('Your ORA has been sent successfully!')
-
-      // Reset to orange after 5 seconds
-      setTimeout(() => {
-        setTransactionStatus('loading') // Reset status to 'loading' (orange)
-      }, 5000)
+      setTimeout(() => setTransactionStatus('loading'), 5000)
     } catch (e) {
       triggerNotification('Failed to send ORA', 'error')
       setTransactionStatus('error')
       setTransactionMessage('Something went wrong with the transaction.')
+      setTimeout(() => setTransactionStatus('loading'), 5000)
     }
 
     setLoading(false)
@@ -133,7 +144,11 @@ const Transact = ({ openModal, setModalState, triggerNotification }: TransactInt
             Close
           </button>
           <button
-            className={`btn ${receiverAddress.length === 58 && amount ? '' : 'btn-disabled'}`}
+            className={`btn ${
+              (receiverAddress.endsWith('.algo') || receiverAddress.length === 58) && amount && !isNaN(Number(amount))
+                ? 'btn-orange'
+                : 'btn-disabled'
+            }`}
             onClick={(e) => {
               e.preventDefault()
               handleSubmitORA()
