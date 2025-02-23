@@ -1,5 +1,6 @@
 import { useWallet } from '@txnlab/use-wallet-react'
 import React, { useEffect, useState } from 'react'
+import NotificationModal from './components/NotificationModal'
 import { Header } from './components/header'
 import Transact from './components/oraSimpleTxn'
 import { Swapper } from './components/swapper'
@@ -18,6 +19,18 @@ const Home: React.FC<HomeProps> = () => {
 
   // Track state changes for debugging
   useEffect(() => {}, [openTransactModal])
+
+  // State for the notification
+  const [showNotification, setShowNotification] = useState(false) // For the notification modal
+  const [notificationMessage, setNotificationMessage] = useState('')
+  const [notificationType, setNotificationType] = useState<'success' | 'error' | 'info'>('info')
+
+  // Function to trigger the notification modal
+  const triggerNotification = (message: string, type: 'success' | 'error' | 'info') => {
+    setNotificationMessage(message)
+    setNotificationType(type)
+    setShowNotification(true)
+  }
 
   return (
     <div>
@@ -47,7 +60,15 @@ const Home: React.FC<HomeProps> = () => {
       )}
 
       {/* Transact Modal */}
-      <Transact openModal={openTransactModal} setModalState={setOpenTransactModal} />
+      <Transact openModal={openTransactModal} setModalState={setOpenTransactModal} triggerNotification={triggerNotification} />
+
+      {/* Notification Modal */}
+      <NotificationModal
+        showNotification={showNotification}
+        notificationMessage={notificationMessage}
+        notificationType={notificationType}
+        setShowNotification={setShowNotification}
+      />
     </div>
   )
 }

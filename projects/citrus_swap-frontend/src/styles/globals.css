@@ -71,7 +71,6 @@ header button {
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.5); /* Darkened background */
-  z-index: 1000;
   justify-content: center;
   align-items: center;
 }
@@ -91,14 +90,15 @@ header button {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border-top: 5px solid #ff7b00; /* Orange accent */
   position: relative;
-  z-index: 10;
+  z-index: 1052; /* Ensure modal box is on top of other content */
+  color: #ff7b00; /* Set default text color for modals to orange */
 }
 
 /* Title */
 .modal-box h3 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #222;
+  color: #ff7b00; /* Ensures the title is also orange */
   margin-bottom: 1.2rem;
 }
 
@@ -125,6 +125,13 @@ header button {
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
+}
+
+/* Error Text */
+.error-text {
+  color: #ff0000; /* Set error text color to red */
+  font-size: 1rem;
+  margin-top: 0.8rem;
 }
 
 /* Close Button */
