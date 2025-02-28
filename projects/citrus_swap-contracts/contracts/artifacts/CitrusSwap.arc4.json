@@ -1,0 +1,56 @@
+{
+  "name": "CitrusSwap",
+  "desc": "",
+  "methods": [
+    {
+      "name": "creatApplication",
+      "args": [
+        {
+          "name": "adminAddress",
+          "type": "address"
+        },
+        {
+          "name": "treasuryAddress",
+          "type": "address"
+        },
+        {
+          "name": "asset1Id",
+          "type": "uint64"
+        },
+        {
+          "name": "asset2Id",
+          "type": "uint64"
+        }
+      ],
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "initApplication",
+      "args": [
+        {
+          "name": "payTxn",
+          "type": "pay"
+        }
+      ],
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "gas",
+      "args": [],
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "createApplication",
+      "args": [],
+      "returns": {
+        "type": "void"
+      }
+    }
+  ]
+}
