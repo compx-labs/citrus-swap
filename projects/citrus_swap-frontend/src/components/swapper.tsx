@@ -1,10 +1,10 @@
 'use client'
 
 import { ArrowsUpDownIcon } from '@heroicons/react/24/outline'
-import { LayoutGroup, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { ALGO_ASSET_ID, ORA_ASSET_ID } from '../constants'
-import { SwapButton } from './swapButton'
+import AnimButton from './animButton'
 import { SwapInput } from './swapInput'
 
 export const Swapper: React.FC = () => {
@@ -13,7 +13,7 @@ export const Swapper: React.FC = () => {
   const onClickSwitchAssets = () => setIsSwapped((prev) => !prev)
 
   return (
-    <LayoutGroup>
+    <div>
       <div className="mx-3 flex flex-col gap-3">
         {isSwapped ? (
           <>
@@ -34,7 +34,9 @@ export const Swapper: React.FC = () => {
               className="w-full flex mx-auto justify-center"
               transition={{ layout: { type: 'spring', stiffness: 300, damping: 20 }, ease: 'easeInOut' }}
             >
-              <ArrowsUpDownIcon className="w-12 h-12 text-lime-300 bg-orange-400 rounded-full border-4 border-lime-300 hover:border-orange-400 hover:text-orange-400 hover:bg-lime-300 hover:scale-150 ease-in-out transition-all" />
+              <span className="w-12 h-12 text-lime-300 bg-orange-400 rounded-full border-4 border-lime-300 hover:border-orange-400 hover:text-orange-400 hover:bg-lime-300 hover:scale-150 ease-in-out transition-all">
+                <ArrowsUpDownIcon />
+              </span>
             </motion.button>
 
             <motion.div
@@ -81,9 +83,9 @@ export const Swapper: React.FC = () => {
 
         {/* Swap Button */}
         <div className="flex w-full mx-auto justify-center">
-          <SwapButton />
+          <AnimButton onClick={() => {}}>Swap</AnimButton>
         </div>
       </div>
-    </LayoutGroup>
+    </div>
   )
 }
