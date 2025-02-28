@@ -1,10 +1,4 @@
-import type { Metadata } from 'next'
 import '../styles/globals.css'
-
-export const metadata: Metadata = {
-  title: 'Citrus Swap',
-  description: 'The micro ORA DEX!',
-}
 
 export default function RootLayout({
   children,
