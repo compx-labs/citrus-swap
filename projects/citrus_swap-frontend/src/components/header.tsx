@@ -18,7 +18,7 @@ const navigation = [
 ]
 
 // ORA asset ID
-const ASSET_ID = BigInt(1284444444) // mainnet: 1284444444 testnet: 513945448
+const ASSET_ID = BigInt(ORA_ASSET_ID) // mainnet: 1284444444 testnet: 513945448
 
 export function Header() {
   const [loading, setLoading] = useState(false)
