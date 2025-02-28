@@ -19,6 +19,9 @@ const navigation = [
   { name: 'Join Our Community', href: 'https://discord.gg/CCC22er4DQ' },
 ]
 
+// ORA asset ID
+const ASSET_ID = BigInt(ORA_ASSET_ID) // mainnet: 1284444444 testnet: 513945448
+
 export function Header() {
   const { loading, setLoading, setTitle, setSecondaryText } = useContext(LoadingContext)
   const { enqueueSnackbar } = useSnackbar()
