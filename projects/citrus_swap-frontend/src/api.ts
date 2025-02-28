@@ -21,7 +21,7 @@ interface SendToVaultRequestBody {
 }
 
 export function sendToVault(name: string, data: SendToVaultRequestBody) {
-  return axios<string>({
+  return axios({
     url: `${API_BASE_URL}/nfd/vault/sendTo/${name}`,
     method: 'post',
     headers: { 'Content-Type': 'application/json' },
