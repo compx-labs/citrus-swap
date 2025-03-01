@@ -26,17 +26,17 @@ export default function App() {
 
   return (
     <RootLayout>
-      <SnackbarProvider maxSnack={3}>
-        <WalletProvider manager={manager}>
-          <WalletContextProvider>
-            <LoadingContextProvider>
+      <LoadingContextProvider>
+        <SnackbarProvider maxSnack={3}>
+          <WalletProvider manager={manager}>
+            <WalletContextProvider>
               <Home />
               <LoadingModal />
-            </LoadingContextProvider>
-            <WalletConnectionModal />
-          </WalletContextProvider>
-        </WalletProvider>
-      </SnackbarProvider>
+              <WalletConnectionModal />
+            </WalletContextProvider>
+          </WalletProvider>
+        </SnackbarProvider>
+      </LoadingContextProvider>
     </RootLayout>
   )
 }

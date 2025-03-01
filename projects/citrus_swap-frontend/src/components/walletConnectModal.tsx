@@ -42,7 +42,7 @@ export const WalletConnectionModal: React.FC = () => {
               <div className=" grid grid-cols-2 cursor-pointer ">
                 {wallets?.map((wallet) => (
                   <div
-                    key={'wallet-' + wallet.metadata.name}
+                    key={`wallet-${wallet.metadata.name}`}
                     className="flex gap-4 p-4 hover:bg-accent rounded-full hover:scale-101 transition-all justify-center items-center"
                     onClick={() => handleOnConnect(wallet)}
                   >

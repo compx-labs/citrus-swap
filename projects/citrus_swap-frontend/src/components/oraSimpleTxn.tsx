@@ -7,6 +7,11 @@ import { sendToVault } from '../api'
 import { ASSET_INFO, ORA_ASSET_ID } from '../constants'
 import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 
+interface NFDData {
+  depositAccount: string | null
+  isOptedIn: boolean
+}
+
 type TransactionsArray = ['u' | 's', string][]
 
 function encodeNFDTransactionsArray(txnsArray: TransactionsArray): Uint8Array[] {
@@ -31,91 +36,130 @@ interface TransactInterface {
 }
 
 const Transact = ({ openModal, setModalState, triggerNotification }: TransactInterface) => {
-  const [loading, setLoading] = useState<boolean>(false)
-  const [receiverAddress, setReceiverAddress] = useState<string>('')
-  const [amount, setAmount] = useState<string>('')
+  const [loading, setLoading] = useState(false)
+  const [receiverAddress, setReceiverAddress] = useState('')
+  const [amount, setAmount] = useState('')
   const [transactionStatus, setTransactionStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [transactionMessage, setTransactionMessage] = useState('')
 
   const wallet = useWallet()
   const { activeAddress, signTransactions } = wallet
-
   const algodConfig = getAlgodConfigFromViteEnvironment()
   const algorand = AlgorandClient.fromConfig({ algodConfig })
 
-  const resolveNFD = async (nfd: string): Promise<{ depositAccount?: string; isOptedIn?: boolean } | null> => {
+  type CustomAssetHolding = {
+    assetId: bigint
+    amount: number
+    isFrozen: boolean
+  }
+
+  const checkIfOptedInToORA = async (depositAccount: string): Promise<boolean> => {
+    try {
+      // Fetch account info
+      const accountInfo = await algorand.account.getInformation(depositAccount)
+
+      if (accountInfo.assets && accountInfo.assets.length > 0) {
+        // Type assertion to CustomAssetHolding[]
+        const assets = accountInfo.assets as unknown as CustomAssetHolding[]
+
+        // Optionally convert bigint to number if necessary
+        assets.forEach((asset) => {
+          asset.amount = Number(asset.amount) // Convert from bigint to number
+        })
+
+        // Check if the account is opted into ORA
+        const isOptedIn = isAccountOptedIn(assets, BigInt(ORA_ASSET_ID)) // Convert ORA_ASSET_ID to bigint
+        return isOptedIn
+      } else {
+        return false
+      }
+    } catch (error) {
+      return false
+    }
+  }
+
+  // Helper function to check if an account is opted into a given asset
+  const isAccountOptedIn = (assets: CustomAssetHolding[], assetId: bigint): boolean => {
+    return assets.some((asset) => asset.assetId === assetId)
+  }
+
+  const resolveNFD = async (nfd: string): Promise<NFDData | null> => {
     try {
       const response = await fetch(`https://api.nf.domains/nfd/${nfd}`)
       const data = await response.json()
 
+      if (!data || !data.depositAccount) {
+        return null
+      }
+
+      const isOptedInToORA = await checkIfOptedInToORA(data.depositAccount)
+
       return {
-        depositAccount: data.depositAccount || null,
-        isOptedIn: data.isOptedIn || false, // Check if opted in
+        depositAccount: data.depositAccount,
+        isOptedIn: isOptedInToORA, // Use the result from the blockchain check
       }
     } catch (error) {
       return null
     }
   }
 
-  const handleSubmitORA = async () => {
-    setLoading(true)
-    setTransactionStatus('loading')
-    setTransactionMessage('Sending ORA transaction...')
-
-    if (!activeAddress) {
-      triggerNotification('Please connect wallet first', 'error')
-      setLoading(false)
-      return
-    }
-
-    if (!receiverAddress || !amount || isNaN(Number(amount))) {
-      triggerNotification('Please enter a valid address and amount', 'error')
-      setLoading(false)
-      return
-    }
-
-    let resolvedAddress = receiverAddress
-    let depositAccount = null
-    let isOptedIn = false
-
-    // Convert the amount entered by the user to micro ORA units (10^8)
-    const amountInMicroORA = BigInt(parseFloat(amount) * 10 ** 8)
-
-    if (receiverAddress.endsWith('.algo')) {
-      triggerNotification('Resolving NFD...', 'info')
-      const nfdData = await resolveNFD(receiverAddress)
-      if (!nfdData?.depositAccount) {
-        triggerNotification('No deposit account found for this NFD', 'error')
-        setLoading(false)
+  const sendSimpleOraTxn = async (receiver: string) => {
+    try {
+      // Ensure activeAddress is not null
+      if (!activeAddress) {
+        triggerNotification('Connect wallet first', 'error')
         return
       }
 
-      depositAccount = nfdData.depositAccount
-      isOptedIn = nfdData?.isOptedIn ?? false
+      const signer = await wallet.transactionSigner
+      const result = await algorand.send.assetTransfer({
+        signer,
+        sender: activeAddress,
+        receiver,
+        assetId: BigInt(ORA_ASSET_ID),
+        amount: BigInt(parseFloat(amount) * 10 ** 8),
+      })
 
-      if (isOptedIn) {
-        triggerNotification(`Deposit Account found: ${depositAccount}`, 'info')
-        resolvedAddress = depositAccount // If opted in, use the deposit account
-      } else {
-        // If not opted in, send to vault
-        triggerNotification('NFD is not opted in, sending to vault...', 'info')
-        resolvedAddress = receiverAddress // Use NFD_NAME if no depositAccount
-      }
+      triggerNotification(
+        `Transaction Sent: <a href="https://lora.algokit.io/mainnet/transaction/${result.txIds[0]}" target="_blank">View</a>`,
+        'success',
+      )
+      confetti({ particleCount: 100, spread: 70 })
+      setReceiverAddress('')
+      setAmount('')
+    } catch (e) {
+      triggerNotification('Transaction failed', 'error')
+    }
+  }
 
-      triggerNotification(`NFD resolved to: ${resolvedAddress}`, 'info')
+  const handleNfdTransaction = async (nfdData: NFDData) => {
+    if (!nfdData.depositAccount) {
+      triggerNotification('Invalid NFD deposit account', 'error')
+      return
+    }
+
+    if (!activeAddress) {
+      triggerNotification('Wallet not connected', 'error')
+      return
     }
 
     try {
-      const signer = await wallet.transactionSigner // Get the signer
+      const resolvedNfdData = await resolveNFD(receiverAddress)
 
-      // If the address is resolved to vault (from NFD_NAME)
-      if (resolvedAddress === receiverAddress) {
+      if (!resolvedNfdData || !resolvedNfdData.depositAccount) {
+        triggerNotification('Invalid NFD deposit account', 'error')
+        return
+      }
 
-        // Using the sendToVault function to handle the vault interaction
+      if (nfdData.isOptedIn) {
+        // If the NFD is opted in, send directly to the deposit account
+        await sendSimpleOraTxn(nfdData.depositAccount)
+      } else {
+        // If not opted in, send to vault
         const response = await sendToVault(receiverAddress, {
           sender: activeAddress,
           assets: [ORA_ASSET_ID],
-          amount: Number(amountInMicroORA), // Convert to number
+          amount: Number(parseFloat(amount) * 10 ** 8), // Convert to number
           optInOnly: false,
         })
 
@@ -124,7 +168,7 @@ const Transact = ({ openModal, setModalState, triggerNotification }: TransactInt
         }
 
         // Fetch and parse transactions
-        const transactionsArray = JSON.parse(response.data) as TransactionsArray
+        const transactionsArray = JSON.parse(response.data)
 
         // Encode the transactions into a format that can be signed
         const encodedTxns = encodeNFDTransactionsArray(transactionsArray)
@@ -133,7 +177,7 @@ const Transact = ({ openModal, setModalState, triggerNotification }: TransactInt
         const signedTransactions = await signTransactions(encodedTxns)
 
         // Remove null values as it does not accept them only UInt
-        const validSignedTxns = signedTransactions.filter((txn) => txn !== null) as Uint8Array[]
+        const validSignedTxns = signedTransactions.filter((txn) => txn !== null)
 
         // Send the transactions to the network
         const transaction = await algorand.client.algod.sendRawTransaction(validSignedTxns).do()
@@ -144,33 +188,37 @@ const Transact = ({ openModal, setModalState, triggerNotification }: TransactInt
         const notificationMessage = `Transaction Sent: <a href="https://lora.algokit.io/mainnet/transaction/${id}" target="_blank" rel="noopener noreferrer" style="font-weight: bold; text-decoration: underline; cursor: pointer;">Explore more</a>`
 
         triggerNotification(notificationMessage, 'success')
-      } else {
-        // Normal ORA transaction if vault is not used
-        const result = await algorand.send.assetTransfer({
-          signer,
-          sender: activeAddress,
-          receiver: resolvedAddress,
-          assetId: BigInt(ORA_ASSET_ID),
-          amount: amountInMicroORA,
-        })
-
-        const notificationMessage = `Transaction Sent: <a href="https://lora.algokit.io/mainnet/transaction/${result.txIds[0]}" target="_blank" rel="noopener noreferrer" style="font-weight: bold; text-decoration: underline; cursor: pointer;">Explore more</a>`
-
-        triggerNotification(notificationMessage, 'success')
       }
+    } catch (error) {
+      triggerNotification('Error sending to vault', 'error')
+    }
+  }
 
-      setReceiverAddress('')
-      setAmount('')
-      confetti({ particleCount: 100, spread: 70, origin: { x: 0.5, y: 0.5 } })
-      setTransactionStatus('success')
-      setTransactionMessage('Your ORA has been sent successfully!')
-      setTimeout(() => setTransactionStatus('loading'), 5000)
-    } catch (e) {
-      console.error('Failed to send ORA:', e)
-      triggerNotification('Failed to send ORA', 'error')
-      setTransactionStatus('error')
-      setTransactionMessage('Something went wrong with the transaction.')
-      setTimeout(() => setTransactionStatus('loading'), 5000)
+  const handleSubmitORA = async () => {
+    if (!activeAddress) {
+      triggerNotification('Connect wallet first', 'error')
+      return
+    }
+
+    const isAlgorandAddress = /^[A-Z2-7]{58}$/.test(receiverAddress)
+    const isNFD = receiverAddress.endsWith('.algo')
+
+    if (!isAlgorandAddress && !isNFD) {
+      triggerNotification('Invalid address', 'error')
+      return
+    }
+
+    setLoading(true)
+
+    if (isAlgorandAddress) {
+      await sendSimpleOraTxn(receiverAddress)
+    } else {
+      const nfdData = await resolveNFD(receiverAddress)
+      if (!nfdData?.depositAccount) {
+        triggerNotification('NFD not found', 'error')
+      } else {
+        await handleNfdTransaction(nfdData)
+      }
     }
 
     setLoading(false)
