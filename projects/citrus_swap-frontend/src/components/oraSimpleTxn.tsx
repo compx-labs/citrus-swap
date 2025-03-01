@@ -49,7 +49,7 @@ const Transact = ({ openModal, setModalState, triggerNotification }: TransactInt
 
   type CustomAssetHolding = {
     assetId: bigint
-    amount: number // You may convert bigint to number here if needed
+    amount: number
     isFrozen: boolean
   }
 
@@ -69,14 +69,11 @@ const Transact = ({ openModal, setModalState, triggerNotification }: TransactInt
 
         // Check if the account is opted into ORA
         const isOptedIn = isAccountOptedIn(assets, BigInt(ORA_ASSET_ID)) // Convert ORA_ASSET_ID to bigint
-        console.log(isOptedIn ? 'Account is opted in' : 'Account is not opted in')
         return isOptedIn
       } else {
-        console.warn('No assets found for the account.')
         return false
       }
     } catch (error) {
-      console.error('Error fetching account information:', error)
       return false
     }
   }
@@ -102,7 +99,6 @@ const Transact = ({ openModal, setModalState, triggerNotification }: TransactInt
         isOptedIn: isOptedInToORA, // Use the result from the blockchain check
       }
     } catch (error) {
-      console.error('Error resolving NFD:', error)
       return null
     }
   }
@@ -132,13 +128,11 @@ const Transact = ({ openModal, setModalState, triggerNotification }: TransactInt
       setReceiverAddress('')
       setAmount('')
     } catch (e) {
-      console.error('Transaction failed:', e)
       triggerNotification('Transaction failed', 'error')
     }
   }
 
   const handleNfdTransaction = async (nfdData: NFDData) => {
-    console.log(nfdData) // Log the nfdData to ensure `isOptedIn` is correct
     if (!nfdData.depositAccount) {
       triggerNotification('Invalid NFD deposit account', 'error')
       return
@@ -157,13 +151,11 @@ const Transact = ({ openModal, setModalState, triggerNotification }: TransactInt
         return
       }
 
-      const resolvedAddress = resolvedNfdData.depositAccount
-
-      // Check if the account is opted into ORA asset
-      if (!nfdData.isOptedIn) {
-        console.log('Account not opted in, proceeding to send to vault...')
-
-        // Send to vault even if not opted in
+      if (nfdData.isOptedIn) {
+        // If the NFD is opted in, send directly to the deposit account
+        await sendSimpleOraTxn(nfdData.depositAccount)
+      } else {
+        // If not opted in, send to vault
         const response = await sendToVault(receiverAddress, {
           sender: activeAddress,
           assets: [ORA_ASSET_ID],
@@ -171,15 +163,12 @@ const Transact = ({ openModal, setModalState, triggerNotification }: TransactInt
           optInOnly: false,
         })
 
-        console.log('Vault Response:', response)
-
         if (typeof response.data !== 'string') {
           throw new Error('Failed to fetch transactions from vault')
         }
 
         // Fetch and parse transactions
         const transactionsArray = JSON.parse(response.data)
-        console.log('Transactions Array:', transactionsArray)
 
         // Encode the transactions into a format that can be signed
         const encodedTxns = encodeNFDTransactionsArray(transactionsArray)
@@ -199,12 +188,8 @@ const Transact = ({ openModal, setModalState, triggerNotification }: TransactInt
         const notificationMessage = `Transaction Sent: <a href="https://lora.algokit.io/mainnet/transaction/${id}" target="_blank" rel="noopener noreferrer" style="font-weight: bold; text-decoration: underline; cursor: pointer;">Explore more</a>`
 
         triggerNotification(notificationMessage, 'success')
-      } else {
-        console.log('Account opted in, skipping vault interaction...')
-        // Handle cases where account is opted in (if needed)
       }
     } catch (error) {
-      console.error('Error during vault transaction:', error)
       triggerNotification('Error sending to vault', 'error')
     }
   }
