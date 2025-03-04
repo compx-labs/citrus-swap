@@ -57,7 +57,7 @@
     "vite-plugin-node-polyfills": "^0.23.0"
   },
   "scripts": {
-    "start": "vite",
+    "start": "tsc && vite build && vite",
     "generate:app-clients": "algokit project link --all",
     "dev": "npm run generate:app-clients && vite",
     "build": "npm run generate:app-clients && tsc && vite build",
