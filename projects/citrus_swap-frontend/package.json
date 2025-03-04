@@ -9,7 +9,7 @@
   "type": "module",
   "engines": {
     "node": "=20.0",
-    "npm": ">=9.0"
+    "npm": "=9.0"
   },
   "devDependencies": {
     "@algorandfoundation/algokit-client-generator": "^4.0.0",
