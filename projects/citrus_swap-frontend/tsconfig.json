@@ -20,16 +20,10 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "outDir": "./dist/"
+    "outDir": "./dist/",
+    "lib": ["dom", "dom.iterable", "esnext"]
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "vite.config.js",
-    "src/utils/ellipseAddress.spec.tsx",
-    "src/utils/ellipseAddress.spec.tsx",
-    "src/main.tsx",
-  ],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.js"],
   "references": [
     {
       "path": "./tsconfig.node.json"
