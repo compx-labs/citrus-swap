@@ -8,8 +8,8 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "=20.0",
-    "npm": "=9.0"
+    "node": "=20",
+    "npm": "=10"
   },
   "devDependencies": {
     "@algorandfoundation/algokit-client-generator": "^4.0.0",
@@ -17,7 +17,7 @@
     "@types/jest": "29.5.2",
     "@types/node": "^18.17.14",
     "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.2.4",
+    "@types/react-dom": "^18.3.5",
     "@typescript-eslint/eslint-plugin": "^7.0.2",
     "@typescript-eslint/parser": "^7.0.2",
     "@vitejs/plugin-react": "^4.2.1",
